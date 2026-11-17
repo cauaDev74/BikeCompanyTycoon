@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bike2D — demonstração (Fase 2)</title>
+<link rel="icon" href="../brand/favicon-light.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lilita+One&display=swap" rel="stylesheet">
+<style>
+/*CSS*/
+.app{display:grid;gap:var(--space-4);padding:var(--space-4);max-width:1200px;margin:0 auto;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr)}
+@media (max-width:860px){.app{grid-template-columns:1fr}}
+.stage{padding:var(--space-4);position:sticky;top:var(--space-2);align-self:start;z-index:var(--z-sticky)}
+@media (max-width:860px){.stage{top:0;padding:var(--space-2)}}
+.stage svg{width:100%;height:auto;display:block}
+.panel{padding:var(--space-4);display:grid;gap:var(--space-4)}
+.field{display:grid;gap:4px;font-size:var(--text-xs)} .field>span{font-weight:700}
+select{min-height:44px;border-radius:var(--radius-sm);border:1px solid var(--border-glass);background:var(--navy);color:var(--fg);font:inherit;font-size:var(--text-sm);padding:0 10px;width:100%}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:var(--space-3)}
+.sw{display:flex;flex-wrap:wrap;gap:6px} .sw button{width:36px;height:36px;border-radius:50%;border:2px solid var(--border-glass);cursor:pointer;padding:0}
+.sw button[aria-pressed=true]{border-color:#fff;box-shadow:0 0 0 2px var(--bg),0 0 0 4px #fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px} .chips label{display:inline-flex;gap:6px;align-items:center;min-height:36px;padding:0 10px;border-radius:var(--radius-pill);background:var(--muted);border:1px solid var(--border-glass);font-size:var(--text-xs)}
+.stages{display:flex;gap:4px;margin-top:var(--space-3)} .stages i{flex:1;height:6px;border-radius:6px;background:var(--steel)}
+.warn{font-size:var(--text-xs);color:var(--text-soft);min-height:1.5em}
+pre{margin:0;max-height:220px;overflow:auto;font:12px/1.4 var(--font-mono);color:var(--text-soft);white-space:pre-wrap}
+h1{margin:0;font-size:var(--text-xl)} h2{margin:0;font-size:var(--text-md);font-family:var(--font-body);font-weight:700}
+</style></head><body>
+<main class="app">
+ <section class="glass stage blueprint" aria-label="Palco do designer">
+  <div id="bike"></div><div class="stages" aria-hidden="true" id="stages"></div>
+  <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+   <button class="btn btn-primary" id="replay">Reproduzir montagem</button>
+   <button class="btn btn-secondary" id="random">Combinação aleatória</button>
+  </div>
+ </section>
+ <section class="glass panel">
+  <h1 class="display">Bike2D · Fase 2</h1>
+  <label class="field"><span>Exemplo pronto</span><select id="example"></select></label>
+  <div class="fields" id="fields"></div>
+  <div class="field"><span>Cor da pintura</span><div class="sw" id="paint"></div></div>
+  <div class="field"><span>Cor de acento (aros, listra, molas)</span><div class="sw" id="accent"></div></div>
+  <label class="field"><span>Acabamento</span><select id="finish"></select></label>
+  <div class="field"><span>Eletrônicos</span><div class="chips" id="elec"></div></div>
+  <label class="chips" style="gap:8px"><label><input type="checkbox" id="rearDisc"> Disco traseiro</label></label>
+  <p class="warn" id="warn" role="status"></p>
+  <details><summary>BikeSpec (JSON)</summary><pre id="json"></pre></details>
+ </section>
+</main>
+<script>
+/*CODE*/
+const $ = id => document.getElementById(id);
+let spec = JSON.parse(JSON.stringify(DATA.examples['cafe-1960-classic'])), uidN = 0;
+const LABEL = { category:'Categoria', layout:'Motor', cooling:'Arrefecimento', frame:'Quadro', material:'Material do quadro', fork:'Garfo', shock:'Amortecedor', brake:'Freio dianteiro', wheels:'Rodas', tyres:'Pneus', fairing:'Carenagem', exhaust:'Escape' };
+const APPROX = new Set(['monocoque','semiactive','linkage','monoblock','underseat']);
+const FIELDS = [
+  ['category', DATA.categories, s => s.category, (s,v) => { s.category = v; }],
+  ['layout', DATA.options.engine, s => s.engine.layout, (s,v) => { s.engine.layout = v; s.engine.cylinders = v==='single'?1:v==='parallel'?2:4; }],
+  ['cooling', DATA.options.cooling, s => s.engine.cooling || 'air', (s,v) => { s.engine.cooling = v; }],
+  ['frame', DATA.options.frame, s => (s.frame||{}).type, (s,v) => { s.frame = { ...(s.frame||{}), type: v }; }],
+  ['material', DATA.options.material, s => (s.frame||{}).material || 'steel', (s,v) => { s.frame = { ...(s.frame||{}), material: v }; }],
+  ['fork', DATA.options.fork, s => s.fork, (s,v) => { s.fork = v; }],
+  ['shock', DATA.options.shock, s => s.shock, (s,v) => { s.shock = v; }],
+  ['brake', DATA.options.brake, s => (s.brakes||{}).front, (s,v) => { s.brakes = { ...(s.brakes||{}), front: v }; }],
+  ['wheels', DATA.options.wheels, s => s.wheels, (s,v) => { s.wheels = v; }],
+  ['tyres', DATA.options.tyres, s => s.tyres, (s,v) => { s.tyres = v; }],
+  ['fairing', DATA.options.fairing, s => s.fairing || 'none', (s,v) => { s.fairing = v; }],
+  ['exhaust', DATA.options.exhaust, s => s.exhaust, (s,v) => { s.exhaust = v; }]
+];
+function build() {
+  $('fields').innerHTML = '';
+  for (const [k, opts, get, set] of FIELDS) {
+    const l = document.createElement('label'); l.className = 'field'; l.innerHTML = `<span>${LABEL[k]}</span>`;
+    const sel = document.createElement('select'); sel.id = 'f-' + k;
+    sel.innerHTML = opts.map(o => `<option value="${o}">${o}${APPROX.has(o) ? ' ≈' : ''}</option>`).join('');
+    sel.addEventListener('change', () => { set(spec, sel.value); draw(false); }); l.appendChild(sel); $('fields').appendChild(l);
+  }
+  for (const [id, key] of [['paint','color'],['accent','accent']]) $(id).innerHTML = Object.entries(DATA.paints).map(([n,c]) => `<button type="button" title="${n}" aria-label="${n}" data-c="${c}" style="background:${c}"></button>`).join('');
+  document.querySelectorAll('#paint button').forEach(b => b.addEventListener('click', () => { spec.paint.color = b.dataset.c; draw(false); }));
+  document.querySelectorAll('#accent button').forEach(b => b.addEventListener('click', () => { spec.paint.accent = b.dataset.c; draw(false); }));
+  $('finish').innerHTML = DATA.finishes.map(f => `<option>${f}</option>`).join('');
+  $('finish').addEventListener('change', () => { spec.paint.finish = $('finish').value; draw(false); });
+  $('elec').innerHTML = DATA.options.electronics.map(e => `<label><input type="checkbox" value="${e}"> ${e}</label>`).join('');
+  $('elec').addEventListener('change', () => { spec.electronics = [...document.querySelectorAll('#elec input:checked')].map(i => i.value); draw(false); });
+  $('rearDisc').addEventListener('change', () => { spec.brakes = { ...(spec.brakes||{}), rearDisc: $('rearDisc').checked }; draw(false); });
+  $('example').innerHTML = Object.keys(DATA.examples).map(k => `<option>${k}</option>`).join('');
+  $('example').addEventListener('change', () => { spec = JSON.parse(JSON.stringify(DATA.examples[$('example').value])); fill(); draw(true); });
+  $('stages').innerHTML = '<i></i>'.repeat(9);
+}
+function norm() { spec.engine = spec.engine || { layout: 'single', cylinders: 1 }; spec.paint = { color: '#c8102e', accent: '#f2c230', finish: 'gloss', ...(spec.paint||{}) }; spec.electronics = spec.electronics || []; }
+function fill() { norm(); for (const [k,, get] of FIELDS) { const v = get(spec); const el = $('f-' + k); if (v != null) el.value = v; }
+  $('finish').value = spec.paint.finish; $('rearDisc').checked = !!(spec.brakes && spec.brakes.rearDisc);
+  document.querySelectorAll('#elec input').forEach(i => i.checked = spec.electronics.includes(i.value));
+  document.querySelectorAll('#paint button').forEach(b => b.setAttribute('aria-pressed', b.dataset.c.toLowerCase() === spec.paint.color.toLowerCase()));
+  document.querySelectorAll('#accent button').forEach(b => b.setAttribute('aria-pressed', b.dataset.c.toLowerCase() === spec.paint.accent.toLowerCase())); }
+function draw(animate) {
+  norm(); let r;
+  try { r = renderBikeSVG(spec, { animate, uid: 'd' + (++uidN) }); } catch (e) { $('warn').textContent = e.message; return; }
+  $('bike').innerHTML = r.svg; fill();
+  $('warn').textContent = r.warnings.length ? 'Aproximado nesta fase: ' + r.warnings.join(' · ') : '';
+  $('json').textContent = JSON.stringify(spec, null, 2);
+  if (animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) { const bars = [...$('stages').children]; bars.forEach(b => b.style.background = ''); bars.forEach((b, i) => setTimeout(() => b.style.background = 'var(--accent)', i * 520)); }
+  else [...$('stages').children].forEach(b => b.style.background = 'var(--accent)');
+}
+function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+$('replay').addEventListener('click', () => draw(true));
+$('random').addEventListener('click', () => { const o = DATA.options; const l = pick(o.engine);
+  spec = { category: pick(DATA.categories), engine: { layout: l, cylinders: l==='single'?1:l==='parallel'?2:4, cooling: pick(o.cooling) }, frame: { type: pick(o.frame), material: pick(o.material) }, fork: pick(o.fork), shock: pick(o.shock),
+    brakes: { front: pick(o.brake), rearDisc: Math.random() > .5 }, wheels: pick(o.wheels), tyres: pick(o.tyres), fairing: pick(o.fairing), exhaust: pick(o.exhaust), electronics: o.electronics.filter(() => Math.random() > .75),
+    paint: { color: pick(Object.values(DATA.paints)), accent: pick(Object.values(DATA.paints)), finish: pick(DATA.finishes) } }; draw(false); });
+build(); draw(true);
+</script></body></html>

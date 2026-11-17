@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bike2D — demonstração (Fase 2)</title>
+<link rel="icon" href="../brand/favicon-light.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lilita+One&display=swap" rel="stylesheet">
+<style>
+/* Bike Company Tycoon — design tokens (GDD §15). Uma paleta para o jogo todo. */
+:root {
+  /* cor */
+  --bg: #0b2d7a;
+  --navy: #071a4a;
+  --fg: #ffffff;
+  --accent: #3ccb4f;
+  --money: var(--accent);
+  --ev: var(--accent);
+  --gold: #ffd43b;
+  --warning: var(--gold);
+  --destructive: #ff5c5c;
+
+  /* vidro: branco em alfa */
+  --surface: rgba(255,255,255,.07);
+  --muted:   rgba(255,255,255,.08);
+  --card:    rgba(255,255,255,.09);
+  --steel:   rgba(255,255,255,.16);
+  --border-glass: rgba(255,255,255,.18);
+  --scrim: rgba(7,26,74,.72);
+  --text-soft: rgba(255,255,255,.85);
+  --glass-blur: 14px;
+
+  /* forma: um valor, escala derivada */
+  --radius: 16px;
+  --radius-xs: calc(var(--radius) * .25);
+  --radius-sm: calc(var(--radius) * .5);
+  --radius-md: calc(var(--radius) * .75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-pill: 999px;
+
+  /* espaçamento (grade de 4px) */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px;
+
+  /* sombras */
+  --shadow-1: 0 2px 8px rgba(7,26,74,.35);
+  --shadow-2: 0 8px 24px rgba(7,26,74,.45);
+  --shadow-3: 0 20px 48px rgba(7,26,74,.6);
+  --focus-ring: 0 0 0 3px var(--bg), 0 0 0 5px var(--fg);
+
+  /* z-index */
+  --z-base: 0; --z-sticky: 10; --z-sheet: 30; --z-modal: 40; --z-toast: 50;
+
+  /* tipografia */
+  --font-display: "Lilita One", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --text-xs: .875rem;
+  --text-sm: .9375rem; --text-md: 1rem; --text-lg: 1.25rem;
+  --text-xl: 1.75rem;  --text-2xl: 2.5rem; --text-3xl: 3.5rem;
+  --lh-body: 1.5; --lh-display: 1.1;
+  --tracking-display: .04em;
+
+  /* motion (GDD §15) */
+  --stage-ms: 520ms; --stage-hold: 3200ms; --stagger-ms: 35ms; --toast-ms: 2600ms;
+  --ease: cubic-bezier(.2,.8,.2,1);
+
+  /* moto procedural: sobrescritas pelo renderizador */
+  --paint: #c8102e; --accent-paint: #f2c230;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --stage-ms: 0ms; --stage-hold: 0ms; --stagger-ms: 0ms; }
+}
+/* Sistema de vidro + componentes base. Requer design-tokens.css */
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 var(--text-md)/var(--lh-body) var(--font-body)}
+:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.display{font-family:var(--font-display);letter-spacing:var(--tracking-display);line-height:var(--lh-display);font-weight:400}
+.num-money{font-family:var(--font-display);color:var(--accent);letter-spacing:.02em}
+.num-loss{font-family:var(--font-display);color:var(--destructive)}
+.mono{font-family:var(--font-mono)}
+
+.glass,.glass-strong,.glass-subtle{border:1px solid var(--border-glass);border-radius:var(--radius-lg);
+  -webkit-backdrop-filter:blur(var(--glass-blur));backdrop-filter:blur(var(--glass-blur))}
+.glass{background:var(--card)} .glass-subtle{background:var(--surface)} .glass-strong{background:var(--steel)}
+.blueprint{background-color:var(--navy);background-image:linear-gradient(rgba(255,255,255,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.1) 1px,transparent 1px);background-size:24px 24px;border-radius:var(--radius-lg)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);min-height:44px;padding:0 var(--space-5);
+  font:600 var(--text-sm)/1 var(--font-body);border-radius:var(--radius-pill);border:1px solid transparent;cursor:pointer;
+  transition:transform 120ms var(--ease),background 120ms,box-shadow 120ms}
+.btn svg{width:20px;height:20px}
+.btn-primary{background:var(--fg);color:var(--navy);box-shadow:var(--shadow-1)}
+.btn-primary:hover{background:#e8eefc} .btn-primary:active{transform:translateY(1px) scale(.98);box-shadow:none}
+.btn-secondary{background:var(--steel);color:var(--fg);border-color:var(--border-glass)}
+.btn-secondary:hover{background:rgba(255,255,255,.24)} .btn-secondary:active{transform:translateY(1px) scale(.98)}
+.btn-danger{background:var(--destructive);color:var(--navy)}
+.btn-danger:hover{background:#ff7676} .btn-danger:active{transform:translateY(1px) scale(.98)}
+.btn:disabled,.btn[aria-disabled=true]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+.tile{position:relative;display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-4);min-height:112px;
+  background:var(--card);border:1px solid var(--border-glass);border-radius:var(--radius-lg);color:var(--fg);text-align:left;cursor:pointer;
+  -webkit-backdrop-filter:blur(var(--glass-blur));backdrop-filter:blur(var(--glass-blur));transition:transform 160ms var(--ease),background 160ms}
+.tile svg{width:32px;height:32px}
+.tile .tile-label{font-family:var(--font-display);letter-spacing:var(--tracking-display);font-size:var(--text-lg);line-height:1.1}
+.tile:hover{background:var(--steel);transform:translateY(-2px)} .tile:active{transform:scale(.98)}
+.tile[aria-disabled=true]{opacity:.45;cursor:not-allowed;transform:none}
+.tile-grid .tile{animation:tile-in 360ms var(--ease) both;animation-delay:calc(var(--i,0) * var(--stagger-ms))}
+@keyframes tile-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.part-card{display:flex;flex-direction:column;overflow:hidden;background:var(--card);border:1px solid var(--border-glass);border-radius:var(--radius-lg)}
+.part-card .photo{aspect-ratio:4/3;background:linear-gradient(160deg,#c9d4e4,#9fb0c8);display:grid;place-items:center;color:var(--navy)}
+.part-card .photo svg{width:40%;height:auto}
+.part-card .body{padding:var(--space-3) var(--space-4) var(--space-4);display:grid;gap:var(--space-2)}
+.part-card .name{font-weight:600}
+.part-card .meta{display:flex;gap:var(--space-4);font-size:var(--text-xs);color:var(--text-soft)}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:var(--radius-pill);background:var(--muted);border:1px solid var(--border-glass);font-size:var(--text-xs)}
+.chip.up::before{content:"▲";color:var(--accent);font-size:.7em} .chip.down::before{content:"▼";color:var(--destructive);font-size:.7em}
+.part-card:hover{background:var(--steel)}
+.part-card.is-locked{background:var(--surface)} .part-card.is-locked .photo{filter:grayscale(1) brightness(.7)}
+.lock-badge{display:inline-flex;align-items:center;gap:6px;font-size:var(--text-xs);font-weight:600;padding:4px 10px;border-radius:var(--radius-pill);background:var(--navy);border:1px solid var(--border-glass);width:fit-content}
+.lock-badge svg{width:16px;height:16px}
+.part-card.is-unaffordable .cost{color:var(--destructive);font-weight:700}
+
+.cat-card{position:relative;aspect-ratio:16/9;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border-glass);background:linear-gradient(135deg,var(--navy),var(--bg))}
+.cat-card .cap{position:absolute;inset:auto 0 0 0;padding:var(--space-3) var(--space-4);background:linear-gradient(transparent,var(--scrim))}
+
+.stat{display:grid;grid-template-columns:96px 1fr auto;gap:var(--space-3);align-items:center;font-size:var(--text-sm)}
+.stat .track{height:10px;border-radius:var(--radius-pill);background:var(--muted);overflow:hidden}
+.stat .fill{height:100%;width:var(--v,50%);background:var(--fg);border-radius:inherit;transition:width 300ms var(--ease)}
+.stat .delta{font-weight:700;min-width:44px;text-align:right}
+.stat .delta.up{color:var(--accent)} .stat .delta.down{color:var(--destructive)}
+
+.progress{height:14px;border-radius:var(--radius-pill);background:var(--muted);border:1px solid var(--border-glass);overflow:hidden}
+.progress>i{display:block;height:100%;width:var(--v,0%);background:linear-gradient(90deg,var(--accent),#7be08a);transition:width 400ms var(--ease)}
+
+.topbar{position:sticky;top:0;z-index:var(--z-sticky);display:flex;align-items:center;gap:var(--space-4);padding:var(--space-2) var(--space-4);flex-wrap:wrap;
+  background:var(--scrim);border-bottom:1px solid var(--border-glass);-webkit-backdrop-filter:blur(var(--glass-blur));backdrop-filter:blur(var(--glass-blur))}
+.topbar .speed{display:flex;gap:4px;margin-left:auto}
+.topbar .speed button{min-width:44px;min-height:44px;border-radius:var(--radius-sm);border:1px solid var(--border-glass);background:var(--surface);color:var(--fg);font:600 var(--text-sm) var(--font-body);cursor:pointer}
+.topbar .speed button[aria-pressed=true]{background:var(--fg);color:var(--navy)}
+
+.tabs{display:flex;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--border-glass);border-radius:var(--radius-pill);width:fit-content;max-width:100%;overflow-x:auto}
+.tabs button{min-height:40px;padding:0 var(--space-4);border:0;border-radius:var(--radius-pill);background:transparent;color:var(--fg);font:600 var(--text-sm) var(--font-body);cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--fg);color:var(--navy)}
+.tabs button:disabled{opacity:.45;cursor:not-allowed}
+.toast{display:flex;gap:var(--space-3);align-items:center;padding:var(--space-3) var(--space-4);background:var(--navy);border:1px solid var(--border-glass);border-radius:var(--radius-md);box-shadow:var(--shadow-2);z-index:var(--z-toast)}
+.toast.live{animation:toast var(--toast-ms) var(--ease) both}
+@keyframes toast{0%{opacity:0;transform:translateY(12px)}10%,85%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-8px)}}
+.modal-scrim{position:fixed;inset:0;display:grid;place-items:center;padding:var(--space-4);background:var(--scrim);z-index:var(--z-modal)}
+.modal{width:min(480px,100%);padding:var(--space-6);display:grid;gap:var(--space-4)}
+.modal .choices{display:grid;gap:var(--space-3)}
+.modal .choice{display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);min-height:56px;padding:var(--space-3) var(--space-4);text-align:left;border-radius:var(--radius-md)}
+.sheet{position:fixed;inset:auto 0 0 0;z-index:var(--z-sheet);max-height:70vh;overflow:auto;padding:var(--space-4);background:var(--navy);border:1px solid var(--border-glass);border-radius:var(--radius-xl) var(--radius-xl) 0 0}
+.sheet::before{content:"";display:block;width:40px;height:4px;margin:0 auto var(--space-3);border-radius:4px;background:var(--steel)}
+.stars{display:inline-flex;gap:2px;color:var(--gold)} .stars svg{width:18px;height:18px;fill:currentColor;stroke:none}
+.stars .off{color:var(--steel)}
+@media (prefers-reduced-motion:reduce){.tile-grid .tile,.toast.live{animation:none}.btn,.tile{transition:none}}
+
+/* Vermelho em texto pequeno só sobre navy (4.15:1 sobre royal reprova AA; sobre navy passa). */
+.neg{display:inline-block;padding:1px 8px;border-radius:var(--radius-pill);background:var(--navy);color:var(--destructive);font-weight:700}
+.pos{color:var(--accent);font-weight:700}
+.stat .delta.down{background:var(--navy);padding:1px 8px;border-radius:var(--radius-pill)}
+.chip.down::before{color:var(--destructive)}
+
+.app{display:grid;gap:var(--space-4);padding:var(--space-4);max-width:1200px;margin:0 auto;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr)}
+@media (max-width:860px){.app{grid-template-columns:1fr}}
+.stage{padding:var(--space-4);position:sticky;top:var(--space-2);align-self:start;z-index:var(--z-sticky)}
+@media (max-width:860px){.stage{top:0;padding:var(--space-2)}}
+.stage svg{width:100%;height:auto;display:block}
+.panel{padding:var(--space-4);display:grid;gap:var(--space-4)}
+.field{display:grid;gap:4px;font-size:var(--text-xs)} .field>span{font-weight:700}
+select{min-height:44px;border-radius:var(--radius-sm);border:1px solid var(--border-glass);background:var(--navy);color:var(--fg);font:inherit;font-size:var(--text-sm);padding:0 10px;width:100%}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:var(--space-3)}
+.sw{display:flex;flex-wrap:wrap;gap:6px} .sw button{width:36px;height:36px;border-radius:50%;border:2px solid var(--border-glass);cursor:pointer;padding:0}
+.sw button[aria-pressed=true]{border-color:#fff;box-shadow:0 0 0 2px var(--bg),0 0 0 4px #fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px} .chips label{display:inline-flex;gap:6px;align-items:center;min-height:36px;padding:0 10px;border-radius:var(--radius-pill);background:var(--muted);border:1px solid var(--border-glass);font-size:var(--text-xs)}
+.stages{display:flex;gap:4px;margin-top:var(--space-3)} .stages i{flex:1;height:6px;border-radius:6px;background:var(--steel)}
+.warn{font-size:var(--text-xs);color:var(--text-soft);min-height:1.5em}
+pre{margin:0;max-height:220px;overflow:auto;font:12px/1.4 var(--font-mono);color:var(--text-soft);white-space:pre-wrap}
+h1{margin:0;font-size:var(--text-xl)} h2{margin:0;font-size:var(--text-md);font-family:var(--font-body);font-weight:700}
+</style></head><body>
+<main class="app">
+ <section class="glass stage blueprint" aria-label="Palco do designer">
+  <div id="bike"></div><div class="stages" aria-hidden="true" id="stages"></div>
+  <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+   <button class="btn btn-primary" id="replay">Reproduzir montagem</button>
+   <button class="btn btn-secondary" id="random">Combinação aleatória</button>
+  </div>
+ </section>
+ <section class="glass panel">
+  <h1 class="display">Bike2D · Fase 2</h1>
+  <label class="field"><span>Exemplo pronto</span><select id="example"></select></label>
+  <div class="fields" id="fields"></div>
+  <div class="field"><span>Cor da pintura</span><div class="sw" id="paint"></div></div>
+  <div class="field"><span>Cor de acento (aros, listra, molas)</span><div class="sw" id="accent"></div></div>
+  <label class="field"><span>Acabamento</span><select id="finish"></select></label>
+  <div class="field"><span>Eletrônicos</span><div class="chips" id="elec"></div></div>
+  <label class="chips" style="gap:8px"><label><input type="checkbox" id="rearDisc"> Disco traseiro</label></label>
+  <p class="warn" id="warn" role="status"></p>
+  <details><summary>BikeSpec (JSON)</summary><pre id="json"></pre></details>
+ </section>
+</main>
+<script>
+// Geometria base das categorias. viewBox 0 0 1000 600, chão em y = rear.y + R. Moto olha para a DIREITA.
+const rad = d => d * Math.PI / 180;
+const VIEWBOX = '0 0 1000 600';
+const GEO = {
+  'scooter':    { R:100, rear:[225,400], front:[800,400], rake:20, forkLen:205, engine:[305,410], pivot:[330,404], seat:[400,262], bar:'flat',   stripe:[[300,352],[492,340]], frame:'backbone',  fork:'telescopic', shock:'dual', wheels:'steel',  tyres:'commuter', exhaust:'stock' },
+  'cafe-racer': { R:135, rear:[205,365], front:[815,365], rake:27, forkLen:255, engine:[470,368], pivot:[335,388], seat:[330,185], bar:'clipon', stripe:[[215,214],[668,170]], frame:'cradle',    fork:'telescopic', shock:'dual', wheels:'spoke',  tyres:'touring',  exhaust:'twin' },
+  'sportbike':  { R:130, rear:[215,370], front:[795,370], rake:24, forkLen:250, engine:[460,372], pivot:[345,392], seat:[320,205], bar:'clipon', stripe:[[240,226],[640,186]], frame:'twinspar',  fork:'usd',        shock:'mono', wheels:'alloy',  tyres:'sport',    exhaust:'full' }
+};
+const CATEGORIES = Object.keys(GEO);
+function anchors(cat) {
+  const g = GEO[cat]; if (!g) throw new Error('categoria sem silhueta na Fase 2: ' + cat);
+  const t = rad(g.rake), d = [Math.sin(t), Math.cos(t)];            // d = direção do garfo (para baixo e para frente)
+  const head = [g.front[0] - g.forkLen * d[0], g.front[1] - g.forkLen * d[1]];   // cabeça de direção
+  const forkTop = [head[0] - 18 * d[0], head[1] - 18 * d[1]];                    // pivô do garfo (topo)
+  return { ...g, cat, forkDir: d, head, forkTop, groundY: g.rear[1] + g.R, tyreW: g.R * .27, rimR: g.R * .73,
+    exhaustOut: [g.rear[0] - 22, g.rear[1] + 20] };                               // saída do escape
+}
+
+// Peças da moto 2D. Cada função recebe os anchors (geometry.js) e o BikeSpec e devolve markup SVG.
+// Cores só por variáveis CSS (com fallback). Nada de fontes, scripts ou imagens externas.
+const f = n => Math.round(n * 10) / 10;
+const pt = p => `${f(p[0])},${f(p[1])}`;
+const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+const add = (a, b) => [a[0] + b[0], a[1] + b[1]];
+const rot = (p, deg) => { const t = deg * Math.PI / 180; return [p[0] * Math.cos(t) - p[1] * Math.sin(t), p[0] * Math.sin(t) + p[1] * Math.cos(t)]; };
+const METAL = 'var(--metal,#c5cedb)', METAL_D = 'var(--metal-dark,#66748a)', RUBBER = 'var(--rubber,#14171c)', ACC = 'var(--accent-paint,#f2c230)', OUT = 'var(--outline,rgba(7,26,74,.55))';
+const line = (a, b, w, s, o = '') => `<line x1="${f(a[0])}" y1="${f(a[1])}" x2="${f(b[0])}" y2="${f(b[1])}" stroke="${s}" stroke-width="${w}" stroke-linecap="round" ${o}/>`;
+const poly = (pts, w, s, o = '') => `<polyline points="${pts.map(pt).join(' ')}" fill="none" stroke="${s}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" ${o}/>`;
+const circ = (c, r, fill, stroke = 'none', sw = 0, o = '') => `<circle cx="${f(c[0])}" cy="${f(c[1])}" r="${f(r)}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" ${o}/>`;
+const coil = (a, b, n, amp, w, s) => {
+  const dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy), nx = -dy / len, ny = dx / len, pts = [a];
+  for (let i = 0; i < n; i++) { const t = (i + .5) / n, k = i % 2 ? -amp : amp; pts.push([a[0] + dx * t + nx * k, a[1] + dy * t + ny * k]); }
+  pts.push(b); return poly(pts, w, s);
+};
+const FRAME_COL = { steel: '#27313f', aluminum: '#b4bfcd', carbon: '#10141a' };
+
+// ---------- mapa de equivalências: o que ainda é aproximado nesta fase ----------
+const FALLBACK = {
+  engine: { v: 'parallel', boxer: 'parallel', inline3: 'inline', v4: 'inline', inline6: 'inline', electric: 'parallel' },
+  frame: { monocoque: 'perimeter' }, fork: { semiactive: 'usd' }, shock: { linkage: 'mono', semiactive: 'mono' },
+  brake: { monoblock: 'radial' }, exhaust: { underseat: 'full' }
+};
+const OPTIONS = {
+  engine: ['single', 'parallel', 'inline'], cooling: ['air', 'oil', 'liquid'],
+  frame: ['backbone', 'cradle', 'doublecradle', 'trellis', 'perimeter', 'twinspar'], material: ['steel', 'aluminum', 'carbon'],
+  fork: ['telescopic', 'cartridge', 'usd'], shock: ['dual', 'mono'], brake: ['drum', 'single', 'twin', 'radial'],
+  wheels: ['spoke', 'steel', 'alloy', 'forged', 'carbon'], tyres: ['commuter', 'touring', 'sport', 'track', 'offroad'],
+  fairing: ['none', 'half', 'full', 'touring', 'winglets'], exhaust: ['stock', 'twin', 'megaphone', 'slipon', 'full', 'titanium'],
+  electronics: ['tft', 'led', 'radar', 'cruise', 'riding_modes', 'traction_control', 'quickshifter', 'imu']
+};
+
+// ---------- 6 · rodas e pneus (independentes, para o aro receber o acento) ----------
+function wheelsParts(A, s) {
+  const tyre = [], rim = [], R = A.R, tw = A.tyreW, ri = R - tw, t = s.tyres || 'sport', type = s.wheels || 'spoke';
+  for (const c of [A.rear, A.front]) {
+    let g = `<g transform="translate(${f(c[0])} ${f(c[1])})">`;
+    g += `<circle r="${f(R - tw / 2)}" fill="none" stroke="${RUBBER}" stroke-width="${f(tw)}"/>`;
+    if (t === 'commuter') g += `<circle r="${f(R - tw * .5)}" fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="${f(tw * .55)}" stroke-dasharray="3 7"/>`;
+    if (t === 'touring') g += `<circle r="${f(R - tw * .5)}" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="${f(tw * .3)}" stroke-dasharray="16 6"/>`;
+    if (t === 'sport' || t === 'track') g += `<circle r="${f(R - 4)}" fill="none" stroke="#fff" stroke-opacity="${t === 'track' ? .05 : .1}" stroke-width="2"/>`;
+    if (t === 'offroad') g += `<circle r="${f(R - 3)}" fill="none" stroke="${RUBBER}" stroke-width="8" stroke-dasharray="10 8"/><circle r="${f(R - 3)}" fill="none" stroke="#fff" stroke-opacity=".1" stroke-width="2" stroke-dasharray="10 8"/>`;
+    tyre.push(g + '</g>');
+    let r = `<g transform="translate(${f(c[0])} ${f(c[1])})">`;
+    r += `<circle r="${f(ri)}" fill="none" stroke="${METAL}" stroke-width="6"/><circle r="${f(ri - 5)}" fill="none" stroke="${ACC}" stroke-width="3"/>`;
+    if (type === 'spoke') { for (let i = 0; i < 28; i++) { const a = i * 2 * Math.PI / 28, o = i % 2 ? .12 : -.12; r += `<line x1="${f(12 * Math.cos(a))}" y1="${f(12 * Math.sin(a))}" x2="${f((ri - 5) * Math.cos(a + o))}" y2="${f((ri - 5) * Math.sin(a + o))}" stroke="${METAL}" stroke-width="1.3"/>`; } }
+    else if (type === 'steel') { r += `<circle r="${f(ri - 5)}" fill="${METAL_D}"/>`; for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3; r += `<circle cx="${f(ri * .6 * Math.cos(a))}" cy="${f(ri * .6 * Math.sin(a))}" r="${f(ri * .12)}" fill="${RUBBER}"/>`; } }
+    else { const n = type === 'forged' ? 7 : 5, w = type === 'forged' ? 7 : type === 'carbon' ? 13 : 11, col = type === 'carbon' ? '#232a35' : METAL;
+      for (let i = 0; i < n; i++) { const a = -Math.PI / 2 + i * 2 * Math.PI / n; r += `<line x1="0" y1="0" x2="${f((ri - 4) * Math.cos(a))}" y2="${f((ri - 4) * Math.sin(a))}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`; }
+      if (type === 'carbon') r += `<circle r="${f(ri - 5)}" fill="none" stroke="#3a4352" stroke-width="2" stroke-dasharray="3 3"/>`; }
+    r += circ([0, 0], 13, METAL_D, METAL, 3) + '</g>';
+    rim.push(r);
+  }
+  return `<g id="${s._uid}-tyres">${tyre.join('')}</g><g id="${s._uid}-rims">${rim.join('')}</g>`;
+}
+
+// ---------- 1 · motor (3 layouts na Fase 2) ----------
+function engineLayer(A, s) {
+  const e = s._engine, [cx, cy] = A.engine, sc = A.cat === 'scooter';
+  const tilt = sc ? 82 : e.layout === 'single' ? 6 : e.layout === 'parallel' ? 12 : (A.cat === 'sportbike' ? 26 : 16);
+  const bw = sc ? 52 : e.layout === 'single' ? 62 : e.layout === 'parallel' ? 72 : 98, bh = sc ? 70 : e.layout === 'single' ? 96 : 104;
+  const depth = Math.min(e.cylinders, 4), liquid = e.cooling === 'liquid';
+  let g = `<rect x="${cx - (sc ? 70 : 88)}" y="${cy - 34}" width="${sc ? 140 : 170}" height="${sc ? 64 : 72}" rx="24" fill="${METAL_D}" stroke="${OUT}" stroke-width="2"/>`;
+  g += `<circle cx="${cx}" cy="${cy}" r="${sc ? 22 : 26}" fill="${METAL}" stroke="${METAL_D}" stroke-width="3"/><circle cx="${cx}" cy="${cy}" r="8" fill="${METAL_D}"/>`;
+  g += `<rect x="${cx - 82}" y="${cy + 6}" width="52" height="26" rx="8" fill="${METAL}" opacity=".55"/>`;
+  const barrel = (dx, dim) => {
+    let b = `<g transform="translate(${cx + dx} ${cy}) rotate(${tilt})" ${dim ? 'opacity=".5"' : ''}>`;
+    b += `<rect x="${-bw / 2}" y="${-bh - 6}" width="${bw}" height="${bh}" rx="6" fill="${dim ? METAL_D : METAL_D}" stroke="${OUT}" stroke-width="2"/>`;
+    if (!liquid) for (let y = -bh; y < -14; y += 11) b += `<rect x="${-bw / 2 - 6}" y="${y}" width="${bw + 12}" height="5" rx="2" fill="${METAL}"/>`;
+    else b += `<rect x="${-bw / 2 + 6}" y="${-bh}" width="${bw - 12}" height="${bh - 14}" rx="5" fill="${METAL}" opacity=".35"/>`;
+    b += `<rect x="${-bw / 2 - 3}" y="${-bh - 42}" width="${bw + 6}" height="40" rx="8" fill="${METAL}" stroke="${OUT}" stroke-width="2"/>`;
+    b += `<rect x="${-bw / 2 + 6}" y="${-bh - 58}" width="${bw - 12}" height="18" rx="6" fill="${METAL_D}" stroke="${OUT}" stroke-width="2"/>`;
+    if (!dim) for (let i = 0; i < 4; i++) b += `<circle cx="${f(-bw / 2 + 14 + i * (bw - 28) / 3)}" cy="${-bh - 49}" r="2.6" fill="${METAL}"/>`;
+    return b + '</g>';
+  };
+  for (let d = depth - 1; d >= 1; d--) g += barrel(-9 * d, true);
+  g += barrel(0, false);
+  if (liquid && !sc) { const p = add(A.engine, rot([bw / 2 + 24, -bh * .55], tilt)); g += `<g transform="translate(${f(p[0])} ${f(p[1])}) rotate(${tilt})"><rect x="-17" y="-48" width="34" height="96" rx="9" fill="${METAL_D}" stroke="${OUT}" stroke-width="2"/>${[-36, -24, -12, 0, 12, 24, 36].map(y => `<line x1="-12" y1="${y}" x2="12" y2="${y}" stroke="${METAL}" stroke-width="3"/>`).join('')}</g>`; }
+  return g;
+}
+
+// ---------- 2 · escapamento ----------
+function exhaustLayer(A, s) {
+  const e = s._engine, [cx, cy] = A.engine, sc = A.cat === 'scooter', type = s._exhaust;
+  const tilt = sc ? 82 : e.layout === 'single' ? 6 : e.layout === 'parallel' ? 12 : (A.cat === 'sportbike' ? 26 : 16);
+  const bw = e.layout === 'single' ? 62 : e.layout === 'parallel' ? 72 : 98, bh = 100;
+  const H0 = add(A.engine, rot([sc ? 40 : bw / 2 - 4, sc ? -30 : -bh - 14], tilt));
+  const Mf = [cx - (sc ? 20 : 70), cy + (sc ? 40 : 84)], Mr = A.exhaustOut;
+  const u = [Mr[0] - Mf[0], Mr[1] - Mf[1]], len = Math.hypot(...u), un = [u[0] / len, u[1] / len], nn = [-un[1], un[0]];
+  let g = '';
+  const nPipes = Math.min(e.cylinders, 4);
+  for (let i = 0; i < nPipes; i++) { const o = (i - (nPipes - 1) / 2) * 4;
+    g += `<path d="M${pt(add(H0, [0, o]))} C${pt(add(H0, [26, 36 + o]))} ${pt([cx + 92, cy + 4 + o])} ${pt([cx + 62, cy + 62 + o])} S${pt([cx + 20, cy + 82 + o])} ${pt(add(Mf, [0, o * .5]))}" fill="none" stroke="${METAL}" stroke-width="9" stroke-linecap="round"/><path d="M${pt(add(H0, [0, o]))} C${pt(add(H0, [26, 36 + o]))} ${pt([cx + 92, cy + 4 + o])} ${pt([cx + 62, cy + 62 + o])} S${pt([cx + 20, cy + 82 + o])} ${pt(add(Mf, [0, o * .5]))}" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="2.5" stroke-linecap="round"/>`; }
+  const can = (a, b, w) => line(a, b, w + 4, METAL_D) + line(a, b, w, METAL) + line(add(a, [0, -w * .22]), add(b, [0, -w * .22]), 3, '#fff', 'stroke-opacity=".45"');
+  if (type === 'stock') g += can(Mf, Mr, 34) + circ(Mr, 12, RUBBER);
+  else if (type === 'twin') { const o1 = [0, 18], o2 = [0, -16]; g += can(add(Mf, o1), add(Mr, o1), 21) + can(add(Mf, [18, -4]), add(Mr, [4, -22]), 21) + circ(add(Mr, o1), 8, RUBBER) + circ(add(Mr, [4, -22]), 8, RUBBER); }
+  else if (type === 'megaphone') { const p0 = [Mf[0] + un[0] * 60, Mf[1] + un[1] * 60]; g += `<polygon points="${pt(add(p0, [nn[0] * 7, nn[1] * 7]))} ${pt(add(Mr, [nn[0] * 22, nn[1] * 22]))} ${pt(add(Mr, [-nn[0] * 22, -nn[1] * 22]))} ${pt(add(p0, [-nn[0] * 7, -nn[1] * 7]))}" fill="${METAL}" stroke="${METAL_D}" stroke-width="3" stroke-linejoin="round"/>` + `<ellipse cx="${f(Mr[0])}" cy="${f(Mr[1])}" rx="8" ry="22" transform="rotate(${f(Math.atan2(un[1], un[0]) * 180 / Math.PI)} ${f(Mr[0])} ${f(Mr[1])})" fill="${RUBBER}"/>`; }
+  else { const full = type === 'full' || type === 'titanium', cb = [Mr[0] - un[0] * (full ? 130 : 105), Mr[1] - un[1] * (full ? 130 : 105)], tip = add(Mr, [0, full ? -16 : 0]);
+    g += line(Mf, cb, 14, METAL_D) + line(Mf, cb, 10, METAL) + can(cb, tip, full ? 28 : 30) + circ(tip, 10, RUBBER);
+    if (type === 'titanium') g += line(add(cb, [30, 0]), add(tip, [-20, 0]), 5, ACC, 'stroke-opacity=".8"'); }
+  return g;
+}
+
+// ---------- 3 · chassi (quadro + balança) ----------
+function chassisLayer(A, s) {
+  const col = FRAME_COL[s._material] || FRAME_COL.steel, hi = s._material === 'aluminum' ? '#fff' : '#9fb0c8', H = A.head, P = A.pivot;
+  const T = [A.seat[0] + 14, A.seat[1] + 34], E = [A.engine[0] + 14, A.engine[1] + 74], F = [A.engine[0] + 112, A.engine[1] + 14], RS = [A.seat[0] - 78, A.seat[1] + 40];
+  const tube = (pts, w) => poly(pts, w, col) + poly(pts, Math.max(1.5, w * .18), hi, 'stroke-opacity=".28"');
+  let g = tube([P, A.rear], 17);
+  if (A.cat === 'scooter') return g + tube([H, [A.engine[0] + 220, A.engine[1] + 36], P], 12);
+  const t = s._frame;
+  if (t === 'backbone') g += tube([H, [P[0] + 20, P[1] - 80]], 18) + tube([[P[0] + 20, P[1] - 80], P], 12) + tube([[P[0] + 20, P[1] - 80], RS], 9) + tube([H, F, E, P], 8);
+  else if (t === 'cradle') g += tube([H, T], 14) + tube([T, P], 12) + tube([H, F, E, P], 12) + tube([T, RS], 9);
+  else if (t === 'doublecradle') g += poly([H, F, E, P].map(p => add(p, [-6, 8])), 11, col, 'opacity=".6"') + tube([H, T], 14) + tube([T, P], 12) + tube([H, F, E, P], 12) + tube([T, RS], 9);
+  else if (t === 'trellis') { const m1 = lerp(H, T, .5), m2 = lerp(H, P, .5), m3 = lerp(T, P, .5), m4 = lerp(H, T, .8), m5 = lerp(H, P, .8);
+    g += tube([H, T], 9) + tube([H, P], 9) + tube([T, P], 9) + tube([m1, m2, m3, m1], 6) + tube([m4, m5], 6) + tube([T, RS], 8); }
+  else { const two = t === 'twinspar', w = two ? 20 : 30, mid = [lerp(H, P, .5)[0], H[1] + 34];
+    if (two) g += poly([add(H, [0, 12]), add(mid, [0, 14]), add(P, [-4, -8])], 14, col, 'opacity=".55"');
+    g += poly([H, mid, P], w, col) + poly([H, mid, P], w * .22, hi, 'stroke-opacity=".35"') + tube([lerp(mid, P, .55), RS], 9) + tube([[P[0] + 6, P[1] - 4], [P[0] - 10, P[1] - 54]], 14); }
+  return g;
+}
+
+// ---------- 4 · suspensão (garfo, guidão, amortecedor) ----------
+function suspensionLayer(A, s) {
+  const top = A.forkTop, ax = A.front, d = A.forkDir, ft = s._fork, mid = lerp(top, ax, ft === 'usd' ? .5 : .46);
+  let g = '';
+  if (ft === 'usd') g += line(top, mid, 18, METAL_D) + line(top, mid, 4, '#fff', 'stroke-opacity=".25"') + line(mid, ax, 11, METAL) + line(mid, ax, 3, '#fff', 'stroke-opacity=".5"') + line(lerp(top, mid, .7), add(lerp(top, mid, .7), [-26 * d[1] * 0 - 14, 0]), 4, METAL_D);
+  else { g += line(top, mid, ft === 'cartridge' ? 13 : 11, METAL) + line(top, mid, 3, '#fff', 'stroke-opacity=".5"') + line(mid, ax, ft === 'cartridge' ? 15 : 14, METAL_D) + line(lerp(mid, ax, .22), lerp(mid, ax, .78), 3, ACC, ft === 'cartridge' ? '' : 'stroke-opacity="0"');
+    if (ft === 'telescopic') for (let i = 0; i < 4; i++) { const p = lerp(top, mid, .2 + i * .2); g += line(add(p, [-8, 0]), add(p, [8, 0]), 3, METAL_D); } }
+  g += `<rect x="${f(top[0] - 24)}" y="${f(top[1] - 4)}" width="48" height="12" rx="6" fill="${METAL_D}" stroke="${OUT}" stroke-width="2" transform="rotate(${f(-Math.atan2(d[0], d[1]) * 0)} ${f(top[0])} ${f(top[1])})"/>`;
+  g += circ(A.front, 14, METAL_D, METAL, 3);
+  if (A.bar === 'flat') g += line(top, [top[0] - 6, top[1] - 40], 9, METAL_D) + line([top[0] - 6, top[1] - 40], [top[0] - 50, top[1] - 44], 12, RUBBER) + `<ellipse cx="${f(top[0] - 38)}" cy="${f(top[1] - 62)}" rx="11" ry="8" fill="${METAL_D}"/>` + line([top[0] - 38, top[1] - 54], [top[0] - 38, top[1] - 44], 3, METAL_D);
+  else { const y0 = top[1] + (A.cat === 'cafe-racer' ? 4 : 10); g += line([top[0] + 2, y0], [top[0] - 38, y0 - 4], 12, RUBBER) + line([top[0] - 2, y0 + 2], [top[0] + 6, y0 + 2], 8, METAL_D); }
+  const sh = s._shock, dualTop = [A.rear[0] + 96, A.seat[1] + 34], dualBot = [A.rear[0] + 8, A.rear[1] - 4], monoTop = [A.pivot[0] + 40, A.seat[1] + 40], monoBot = [A.pivot[0] - 14, A.pivot[1] + 6];
+  const unit = (a, b, op = '') => { const m = lerp(a, b, .38); return `<g ${op}>` + line(a, m, 9, METAL_D) + line(m, b, 12, METAL) + coil(lerp(a, b, .3), lerp(a, b, .93), 9, 9, 3.4, ACC) + circ(a, 6, METAL_D) + circ(b, 6, METAL_D) + '</g>'; };
+  if (sh === 'dual') g += unit(add(dualBot, [-6, -6]), add(dualTop, [-6, -4]), 'opacity=".55"') + unit(dualBot, dualTop);
+  else g += unit(monoBot, monoTop) + line(add(monoBot, [-20, 14]), monoBot, 7, METAL_D) + line(add(monoBot, [-20, 14]), add(A.pivot, [-30, 10]), 7, METAL_D);
+  return g;
+}
+
+// ---------- 5 · freios ----------
+function brakesLayer(A, s) {
+  const br = s._brake, rd = s.brakes && s.brakes.rearDisc, R = A.R;
+  const disc = (c, r, twin) => { let o = '';
+    if (twin) o += `<circle cx="${f(c[0] - 6)}" cy="${f(c[1])}" r="${f(r)}" fill="none" stroke="${METAL_D}" stroke-width="7"/>`;
+    o += `<circle cx="${f(c[0])}" cy="${f(c[1])}" r="${f(r)}" fill="none" stroke="${METAL}" stroke-width="7"/><circle cx="${f(c[0])}" cy="${f(c[1])}" r="${f(r - 4)}" fill="none" stroke="${METAL_D}" stroke-width="1.5"/>`;
+    for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; o += circ([c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)], 1.6, RUBBER); } return o; };
+  const cal = (c, r, ang, big, accent) => { const a = ang * Math.PI / 180, p = [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)], w = big ? 22 : 18, h = big ? 40 : 32;
+    return `<g transform="translate(${f(p[0])} ${f(p[1])}) rotate(${f(ang + 90)})"><rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" rx="6" fill="${accent ? ACC : METAL_D}" stroke="${OUT}" stroke-width="2"/><rect x="${-w / 2 + 4}" y="${-h / 2 + 5}" width="${w - 8}" height="6" rx="3" fill="#fff" opacity=".35"/></g>`; };
+  let g = '';
+  if (br === 'drum') g += circ(A.front, R * .32, METAL_D, METAL, 4) + circ(A.front, R * .18, METAL, METAL_D, 2);
+  else { const r = R * .6, tw = br !== 'single'; g += disc(A.front, r, tw) + cal(A.front, r, 215, br === 'radial', br === 'radial'); if (tw) g += cal(A.front, r, 240, false, false); }
+  if (rd && br !== 'drum') g += disc(A.rear, R * .44, false) + cal(A.rear, R * .44, 32, false, false);
+  else if (br === 'drum' || !rd) g += circ(A.rear, R * .3, METAL_D, METAL, 4);
+  return g;
+}
+
+// ---------- 7 · carroceria (formas pintáveis + extras) ----------
+function bodyShapes(A, s) {
+  const H = A.head, h = (x, y) => `${f(H[0] + x)} ${f(H[1] + y)}`, S = [], X = [];
+  const fa = s._fairing;
+  const fenderF = `M${f(A.front[0] - 62)} ${f(A.front[1] - A.R - 8)} Q${f(A.front[0])} ${f(A.front[1] - A.R - 42)} ${f(A.front[0] + 66)} ${f(A.front[1] - A.R + 2)} L${f(A.front[0] + 58)} ${f(A.front[1] - A.R + 12)} Q${f(A.front[0])} ${f(A.front[1] - A.R - 22)} ${f(A.front[0] - 56)} ${f(A.front[1] - A.R + 4)} Z`;
+  if (A.cat === 'scooter') {
+    S.push({ d: 'M684 186 C704 171 744 173 758 191 L746 250 C740 330 720 398 664 442 L572 442 C620 386 628 330 628 272 Z', paint: true });
+    S.push({ d: 'M470 438 L660 438 L660 466 C660 470 656 472 652 472 L478 472 C470 472 466 468 466 462 Z', paint: true });
+    S.push({ d: 'M312 332 C310 282 350 258 430 256 L494 262 C498 340 494 412 466 452 L360 456 C326 444 312 392 312 332 Z', paint: true });
+    S.push({ d: `M${f(A.rear[0] - 112)} 372 C${f(A.rear[0] - 108)} 300 ${f(A.rear[0] - 60)} 282 ${f(A.rear[0])} 282 C${f(A.rear[0] + 66)} 282 ${f(A.rear[0] + 104)} 316 ${f(A.rear[0] + 108)} 372 L${f(A.rear[0] + 90)} 372 C${f(A.rear[0] + 86)} 328 ${f(A.rear[0] + 52)} 304 ${f(A.rear[0])} 304 C${f(A.rear[0] - 48)} 304 ${f(A.rear[0] - 86)} 328 ${f(A.rear[0] - 92)} 372 Z`, paint: true });
+    S.push({ d: 'M316 258 C360 236 440 236 496 252 L494 266 C440 258 360 258 318 270 Z', paint: false, fill: 'var(--seat,#1b2029)' });
+    S.push({ d: fenderF, paint: true });
+    X.push(`<ellipse cx="${f(H[0] + 24)}" cy="${f(H[1] + 4)}" rx="22" ry="26" fill="var(--lamp,#f3f6ff)" stroke="${OUT}" stroke-width="3"/>`);
+  } else {
+    const cr = A.cat === 'cafe-racer';
+    if (cr) {
+      S.push({ d: 'M435 192 C452 152 560 134 656 148 C672 151 676 176 660 190 C590 207 500 214 435 202 Z', paint: true });
+      S.push({ d: 'M205 232 C195 192 240 162 312 162 C362 162 402 176 438 190 L436 210 L242 236 Z', paint: true });
+      S.push({ d: 'M214 238 C208 228 216 218 232 216 L330 206 L330 214 L240 240 Z', paint: false, fill: 'var(--seat,#1b2029)' });
+      S.push({ d: 'M318 170 C360 164 404 178 440 192 L438 200 C400 190 360 182 318 180 Z', paint: false, fill: 'var(--seat,#1b2029)' });
+      S.push({ d: fenderF, paint: true });
+    } else {
+      S.push({ d: 'M428 200 C452 162 556 150 640 166 L656 188 C580 208 500 216 428 218 Z', paint: true });
+      S.push({ d: 'M186 240 C210 206 270 192 340 202 L444 216 L432 238 L226 250 Z', paint: true });
+      S.push({ d: 'M248 214 C290 196 346 194 400 208 L400 216 C346 206 292 208 252 224 Z', paint: false, fill: 'var(--seat,#1b2029)' });
+      if (fa === 'none') S.push({ d: fenderF, paint: true });
+    }
+    if (fa === 'half' || fa === 'touring') {
+      const tall = fa === 'touring' ? -34 : 0;
+      S.push({ d: `M${h(-34, -34)} C${h(-10, -66 + tall)} ${h(40, -46 + tall)} ${h(52, -4)} C${h(60, 36)} ${h(38, 64)} ${h(6, 64)} C${h(-26, 62)} ${h(-44, 22)} ${h(-34, -34)} Z`, paint: true });
+      X.push(`<path d="M${h(-14, -60 + tall)} L${h(18, -52 + tall)} L${h(26, -16)} L${h(-8, -20)} Z" fill="#cfe4ff" fill-opacity=".38" stroke="#fff" stroke-opacity=".5" stroke-width="2"/>`);
+    }
+    if (fa === 'full' || fa === 'winglets') {
+      S.push({ d: `M${h(-64, -2)} C${h(-34, -44)} ${h(-10, -62)} ${h(16, -62)} L${h(32, -30)} C${h(70, -4)} ${h(92, 40)} ${h(76, 84)} L${h(34, 112)} C${h(-20, 140)} ${h(-90, 170)} ${h(-170, 182)} L${h(-196, 160)} C${h(-150, 128)} ${h(-100, 84)} ${h(-58, 24)} Z`, paint: true });
+      X.push(`<path d="M${h(-6, -60)} L${h(20, -60)} L${h(32, -28)} L${h(-18, -24)} Z" fill="#cfe4ff" fill-opacity=".38" stroke="#fff" stroke-opacity=".5" stroke-width="2"/>`);
+      if (fa === 'winglets') S.push({ d: `M${h(44, 80)} L${h(104, 70)} L${h(96, 92)} L${h(40, 100)} Z`, paint: true });
+    }
+    if (fa === 'none' || fa === 'half' || fa === 'touring') X.push(`<ellipse cx="${f(H[0] + 28)}" cy="${f(H[1] + 14)}" rx="20" ry="25" transform="rotate(-18 ${f(H[0] + 28)} ${f(H[1] + 14)})" fill="var(--lamp,#f3f6ff)" stroke="${OUT}" stroke-width="3"/>`);
+    else X.push(`<ellipse cx="${f(H[0] + 50)}" cy="${f(H[1] + 34)}" rx="14" ry="22" transform="rotate(-18 ${f(H[0] + 50)} ${f(H[1] + 34)})" fill="var(--lamp,#f3f6ff)" stroke="${OUT}" stroke-width="3"/>`);
+  }
+  return { shapes: S, extras: X.join('') };
+}
+
+// ---------- 8 · eletrônicos (detalhes pequenos) ----------
+function electronicsLayer(A, s) {
+  const ids = s._electronics, H = A.head, top = A.forkTop; let g = '';
+  const lamp = A.cat === 'scooter' ? [H[0] + 24, H[1] + 4] : (s._fairing === 'full' || s._fairing === 'winglets') ? [H[0] + 50, H[1] + 34] : [H[0] + 28, H[1] + 14];
+  if (ids.includes('led')) g += `<ellipse cx="${f(lamp[0])}" cy="${f(lamp[1])}" rx="26" ry="31" fill="none" stroke="${ACC}" stroke-width="3" stroke-opacity=".9"/><ellipse cx="${f(lamp[0])}" cy="${f(lamp[1])}" rx="33" ry="38" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="2"/>`;
+  if (ids.includes('tft')) g += `<g transform="translate(${f(top[0] - 30)} ${f(top[1] - 26)}) rotate(-18)"><rect width="34" height="20" rx="4" fill="#0a1226" stroke="${METAL}" stroke-width="2"/><rect x="4" y="4" width="14" height="4" rx="2" fill="var(--accent,#3ccb4f)"/><rect x="4" y="11" width="24" height="3" rx="1.5" fill="#fff" opacity=".6"/></g>`;
+  if (ids.includes('radar')) g += `<rect x="${f(lamp[0] + 18)}" y="${f(lamp[1] - 4)}" width="14" height="30" rx="5" fill="#0a1226" stroke="${METAL}" stroke-width="2"/><circle cx="${f(lamp[0] + 25)}" cy="${f(lamp[1] + 11)}" r="3.5" fill="${ACC}"/>`;
+  if (ids.some(i => ['cruise', 'riding_modes', 'traction_control', 'quickshifter', 'imu'].includes(i))) g += [0, 1, 2].map(i => circ([top[0] - 16 - i * 7, top[1] + (A.cat === 'scooter' ? -52 : 12)], 2.4, 'var(--accent,#3ccb4f)')).join('');
+  return g;
+}
+
+
+
+
+const STAGES = ['engine', 'exhaust', 'chassis', 'suspension', 'brakes', 'wheels', 'body', 'electronics', 'paint'];
+const FINISHES = ['gloss', 'matte', 'satin', 'metallic', 'chrome'];
+const PAINTS = { 'Racing Red': '#c8102e', 'Signal Orange': '#ff6a1a', 'Sunburst Yellow': '#f2c230', 'British Green': '#1f5a3a', 'Teal Mist': '#22c8a8', 'Ocean Blue': '#1f5fd1', 'Midnight Navy': '#15213a', 'Plum': '#6a2c6e', 'Pearl White': '#e9ecef', 'Silver': '#a9b1ba', 'Gunmetal': '#4a5560', 'Jet Black': '#121417' };
+// z-order do DOM (de baixo para cima). A ANIMAÇÃO usa data-stage (1 a 9), que segue a ordem do GDD.
+const Z = ['wheels', 'chassis', 'suspension', 'engine', 'exhaust', 'brakes', 'body', 'paint', 'electronics'];
+
+function resolve(slot, id, def, warn) {
+  const map = FALLBACK[slot] || {}, ok = OPTIONS[slot] || [];
+  if (id == null) return def;
+  if (map[id]) { warn.push(`${slot}: «${id}» aproximado como «${map[id]}»`); return map[id]; }
+  if (ok.length && !ok.includes(id)) { warn.push(`${slot}: «${id}» desconhecido, usando «${def}»`); return def; }
+  return id;
+}
+const hex = c => (/^#[0-9a-f]{6}$/i.test(c) ? c : '#c8102e');
+
+function renderBikeSVG(spec, opts = {}) {
+  const warn = [], uid = opts.uid || 'b2d', only = opts.only || null;
+  const cat = spec.category; if (!GEO[cat]) throw new Error(`Categoria «${cat}» ainda sem silhueta (Fase 2: ${Object.keys(GEO).join(', ')})`);
+  const A = anchors(cat), g = GEO[cat], e = spec.engine || {};
+  const layout = FALLBACK.engine[e.layout] || e.layout || 'single';
+  if (FALLBACK.engine[e.layout]) warn.push(`engine: layout «${e.layout}» aproximado como «${layout}»`);
+  const s = { ...spec, _uid: uid,
+    _engine: { layout: ['single', 'parallel', 'inline'].includes(layout) ? layout : 'single', cylinders: e.cylinders || (layout === 'single' ? 1 : layout === 'parallel' ? 2 : 4), cooling: e.cooling || (layout === 'inline' ? 'liquid' : 'air') },
+    _frame: resolve('frame', spec.frame && spec.frame.type, g.frame, warn), _material: (spec.frame && spec.frame.material) || 'steel',
+    _fork: resolve('fork', spec.fork, g.fork, warn), _shock: resolve('shock', spec.shock, g.shock, warn),
+    _brake: resolve('brake', spec.brakes && spec.brakes.front, 'single', warn), _exhaust: resolve('exhaust', spec.exhaust, g.exhaust, warn),
+    wheels: resolve('wheels', spec.wheels, g.wheels, warn), tyres: resolve('tyres', spec.tyres, g.tyres, warn),
+    _fairing: cat === 'scooter' ? 'none' : resolve('fairing', spec.fairing, 'none', warn), _electronics: spec.electronics || [] };
+  if (cat === 'scooter' && spec.fairing && spec.fairing !== 'none') warn.push('fairing: scooter não usa carenagem (ignorada)');
+  const paint = spec.paint || {}, color = hex(paint.color), accent = hex(paint.accent || '#f2c230'), finish = FINISHES.includes(paint.finish) ? paint.finish : 'gloss';
+  const body = bodyShapes(A, s);
+  const layers = {
+    engine: engineLayer(A, s), exhaust: exhaustLayer(A, s), chassis: chassisLayer(A, s), suspension: suspensionLayer(A, s), brakes: brakesLayer(A, s),
+    wheels: wheelsParts(A, s),
+    body: body.shapes.map(p => `<path d="${p.d}" fill="${p.paint ? 'var(--primer,#9aa6b5)' : p.fill}" stroke="var(--outline,rgba(7,26,74,.55))" stroke-width="2.5" stroke-linejoin="round"/>`).join('')   ,
+    electronics: body.extras + electronicsLayer(A, s), paint: ''
+  };
+  const clipId = `${uid}-clip`, painted = body.shapes.filter(p => p.paint);
+  const defs = `<clipPath id="${clipId}">${painted.map(p => `<path d="${p.d}"/>`).join('')}</clipPath>
+<linearGradient id="${uid}-shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".0"/><stop offset=".55" stop-color="#000" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".34"/></linearGradient>
+<linearGradient id="${uid}-hi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".62"/><stop offset=".32" stop-color="#fff" stop-opacity=".12"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<linearGradient id="${uid}-chrome" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8ff"/><stop offset=".28" stop-color="#8d9bb0"/><stop offset=".5" stop-color="#e9eef7"/><stop offset=".62" stop-color="#5a6678"/><stop offset="1" stop-color="#c9d3e2"/></linearGradient>
+<pattern id="${uid}-flake" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="#fff" fill-opacity=".55"/><circle cx="6.5" cy="6" r=".8" fill="#fff" fill-opacity=".35"/></pattern>`;
+  const full = '<rect x="0" y="0" width="1000" height="600"';
+  let pnt = `<g clip-path="url(#${clipId})">`;
+  if (finish === 'chrome') pnt += `${full} fill="url(#${uid}-chrome)"/>${full} fill="url(#${uid}-hi)" opacity=".5"/>`;
+  else { pnt += `${full} fill="var(--paint,#c8102e)"/>${full} fill="url(#${uid}-shade)"/>`;
+    if (finish === 'gloss') pnt += `${full} fill="url(#${uid}-hi)"/>`;
+    if (finish === 'satin') pnt += `${full} fill="url(#${uid}-hi)" opacity=".35"/>`;
+    if (finish === 'metallic') pnt += `${full} fill="url(#${uid}-flake)"/>${full} fill="url(#${uid}-hi)" opacity=".5"/>`; }
+  const st = g.stripe; pnt += `<polyline points="${st.map(p => p.join(',')).join(' ')}" fill="none" stroke="var(--accent-paint,#f2c230)" stroke-width="12" stroke-linecap="butt" opacity="${finish === 'chrome' ? 0 : .95}"/></g>`;
+  layers.paint = pnt;
+  const wb = (A.front[0] - A.rear[0]) / 2 + A.R;
+  const css = `<style>.b2d-anim .b2d-layer{animation:b2d-in 520ms cubic-bezier(.2,.8,.2,1) both;animation-delay:calc((var(--stage) - 1) * 520ms)}@keyframes b2d-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}@media (prefers-reduced-motion:reduce){.b2d-anim .b2d-layer{animation:none}}</style>`;
+  let out = `<svg xmlns="http://www.w3.org/2000/svg" class="bike2d${opts.animate ? ' b2d-anim' : ''}" viewBox="${VIEWBOX}" role="img" aria-label="${cat}" style="--paint:${color};--accent-paint:${accent}">${css}<defs>${defs}</defs>`;
+  out += `<ellipse cx="${(A.rear[0] + A.front[0]) / 2}" cy="${A.groundY + 4}" rx="${wb + 10}" ry="11" fill="#071a4a" opacity=".38"/>`;
+  const sizes = {};
+  for (const k of Z) { if (only && !only.includes(k)) continue; sizes[k] = layers[k].length;
+    out += `<g id="${uid}-layer-${k}" class="b2d-layer" data-stage="${STAGES.indexOf(k) + 1}" style="--stage:${STAGES.indexOf(k) + 1}">${layers[k]}</g>`; }
+  out += '</svg>';
+  return { svg: out, warnings: warn, layerSizes: sizes, anchors: { rearAxle: A.rear, frontAxle: A.front, steeringHead: A.head, forkPivot: A.forkTop, engineMount: A.engine, exhaustOut: A.exhaustOut, seat: A.seat, swingarmPivot: A.pivot, ground: A.groundY } };
+}
+
+const DATA={"options":{"engine":["single","parallel","inline"],"cooling":["air","oil","liquid"],"frame":["backbone","cradle","doublecradle","trellis","perimeter","twinspar"],"material":["steel","aluminum","carbon"],"fork":["telescopic","cartridge","usd"],"shock":["dual","mono"],"brake":["drum","single","twin","radial"],"wheels":["spoke","steel","alloy","forged","carbon"],"tyres":["commuter","touring","sport","track","offroad"],"fairing":["none","half","full","touring","winglets"],"exhaust":["stock","twin","megaphone","slipon","full","titanium"],"electronics":["tft","led","radar","cruise","riding_modes","traction_control","quickshifter","imu"]},"paints":{"Racing Red":"#c8102e","Signal Orange":"#ff6a1a","Sunburst Yellow":"#f2c230","British Green":"#1f5a3a","Teal Mist":"#22c8a8","Ocean Blue":"#1f5fd1","Midnight Navy":"#15213a","Plum":"#6a2c6e","Pearl White":"#e9ecef","Silver":"#a9b1ba","Gunmetal":"#4a5560","Jet Black":"#121417"},"finishes":["gloss","matte","satin","metallic","chrome"],"categories":["scooter","cafe-racer","sportbike"],"examples":{"cafe-1960-classic":{"category":"cafe-racer","engine":{"layout":"parallel","cylinders":2,"cooling":"air"},"frame":{"type":"cradle","material":"steel"},"fork":"telescopic","shock":"dual","brakes":{"front":"drum","rearDisc":false,"abs":"none"},"wheels":"spoke","tyres":"touring","fairing":"none","exhaust":"twin","electronics":[],"paint":{"color":"#c8102e","accent":"#f2c230","finish":"gloss"}},"cafe-trellis-alloy":{"category":"cafe-racer","engine":{"layout":"inline","cylinders":4,"cooling":"liquid"},"frame":{"type":"trellis","material":"steel"},"fork":"cartridge","shock":"mono","brakes":{"front":"single","rearDisc":true},"wheels":"alloy","tyres":"sport","fairing":"none","exhaust":"megaphone","electronics":[],"paint":{"color":"#1f5a3a","accent":"#f2c230","finish":"satin"}},"scooter-commuter":{"category":"scooter","engine":{"layout":"single","cylinders":1,"cooling":"air"},"paint":{"color":"#22c8a8","accent":"#ffffff","finish":"gloss"},"electronics":["led"]},"scooter-modern":{"category":"scooter","engine":{"layout":"single","cylinders":1,"cooling":"liquid"},"wheels":"alloy","tyres":"touring","fork":"cartridge","brakes":{"front":"single","rearDisc":false},"paint":{"color":"#e9ecef","accent":"#1f5fd1","finish":"metallic"},"electronics":["led","tft"]},"sport-superbike":{"category":"sportbike","engine":{"layout":"inline","cylinders":4,"cooling":"liquid"},"frame":{"type":"twinspar","material":"aluminum"},"fork":"usd","shock":"mono","brakes":{"front":"radial","rearDisc":true},"wheels":"forged","tyres":"track","fairing":"full","exhaust":"titanium","electronics":["tft","led","quickshifter","imu"],"paint":{"color":"#c8102e","accent":"#ffffff","finish":"gloss"}},"sport-winglets-chrome":{"category":"sportbike","engine":{"layout":"inline","cylinders":4,"cooling":"liquid"},"frame":{"type":"perimeter","material":"carbon"},"fork":"usd","shock":"mono","brakes":{"front":"twin","rearDisc":true},"wheels":"carbon","tyres":"sport","fairing":"winglets","exhaust":"full","electronics":["tft","radar"],"paint":{"color":"#121417","accent":"#ff6a1a","finish":"chrome"}},"sport-naked-twin":{"category":"sportbike","engine":{"layout":"parallel","cylinders":2,"cooling":"liquid"},"frame":{"type":"trellis","material":"steel"},"fork":"cartridge","shock":"mono","brakes":{"front":"twin","rearDisc":true},"wheels":"alloy","tyres":"sport","fairing":"half","exhaust":"slipon","paint":{"color":"#ff6a1a","accent":"#121417","finish":"matte"}},"cafe-single-spoke":{"category":"cafe-racer","engine":{"layout":"single","cylinders":1,"cooling":"air"},"frame":{"type":"backbone","material":"steel"},"wheels":"steel","tyres":"commuter","exhaust":"stock","paint":{"color":"#1f5fd1","accent":"#e9ecef","finish":"gloss"}},"cafe-double-cradle":{"category":"cafe-racer","engine":{"layout":"inline","cylinders":4,"cooling":"oil"},"frame":{"type":"doublecradle","material":"steel"},"fork":"usd","shock":"dual","brakes":{"front":"twin","rearDisc":true},"wheels":"alloy","tyres":"sport","fairing":"half","exhaust":"full","paint":{"color":"#6a2c6e","accent":"#f2c230","finish":"metallic"}},"sport-offroad-tyres":{"category":"sportbike","engine":{"layout":"single","cylinders":1,"cooling":"liquid"},"frame":{"type":"backbone","material":"aluminum"},"tyres":"offroad","wheels":"spoke","fairing":"touring","exhaust":"megaphone","paint":{"color":"#f2c230","accent":"#121417","finish":"satin"}},"cafe-semiactive-approx":{"category":"cafe-racer","engine":{"layout":"v","cylinders":2},"frame":{"type":"monocoque","material":"carbon"},"fork":"semiactive","shock":"linkage","brakes":{"front":"monoblock","rearDisc":true},"wheels":"spoke","tyres":"touring","fairing":"none","exhaust":"underseat","electronics":[],"paint":{"color":"#4a5560","accent":"#3ccb4f","finish":"metallic"}}}};
+const $ = id => document.getElementById(id);
+let spec = JSON.parse(JSON.stringify(DATA.examples['cafe-1960-classic'])), uidN = 0;
+const LABEL = { category:'Categoria', layout:'Motor', cooling:'Arrefecimento', frame:'Quadro', material:'Material do quadro', fork:'Garfo', shock:'Amortecedor', brake:'Freio dianteiro', wheels:'Rodas', tyres:'Pneus', fairing:'Carenagem', exhaust:'Escape' };
+const APPROX = new Set(['monocoque','semiactive','linkage','monoblock','underseat']);
+const FIELDS = [
+  ['category', DATA.categories, s => s.category, (s,v) => { s.category = v; }],
+  ['layout', DATA.options.engine, s => s.engine.layout, (s,v) => { s.engine.layout = v; s.engine.cylinders = v==='single'?1:v==='parallel'?2:4; }],
+  ['cooling', DATA.options.cooling, s => s.engine.cooling || 'air', (s,v) => { s.engine.cooling = v; }],
+  ['frame', DATA.options.frame, s => (s.frame||{}).type, (s,v) => { s.frame = { ...(s.frame||{}), type: v }; }],
+  ['material', DATA.options.material, s => (s.frame||{}).material || 'steel', (s,v) => { s.frame = { ...(s.frame||{}), material: v }; }],
+  ['fork', DATA.options.fork, s => s.fork, (s,v) => { s.fork = v; }],
+  ['shock', DATA.options.shock, s => s.shock, (s,v) => { s.shock = v; }],
+  ['brake', DATA.options.brake, s => (s.brakes||{}).front, (s,v) => { s.brakes = { ...(s.brakes||{}), front: v }; }],
+  ['wheels', DATA.options.wheels, s => s.wheels, (s,v) => { s.wheels = v; }],
+  ['tyres', DATA.options.tyres, s => s.tyres, (s,v) => { s.tyres = v; }],
+  ['fairing', DATA.options.fairing, s => s.fairing || 'none', (s,v) => { s.fairing = v; }],
+  ['exhaust', DATA.options.exhaust, s => s.exhaust, (s,v) => { s.exhaust = v; }]
+];
+function build() {
+  $('fields').innerHTML = '';
+  for (const [k, opts, get, set] of FIELDS) {
+    const l = document.createElement('label'); l.className = 'field'; l.innerHTML = `<span>${LABEL[k]}</span>`;
+    const sel = document.createElement('select'); sel.id = 'f-' + k;
+    sel.innerHTML = opts.map(o => `<option value="${o}">${o}${APPROX.has(o) ? ' ≈' : ''}</option>`).join('');
+    sel.addEventListener('change', () => { set(spec, sel.value); draw(false); }); l.appendChild(sel); $('fields').appendChild(l);
+  }
+  for (const [id, key] of [['paint','color'],['accent','accent']]) $(id).innerHTML = Object.entries(DATA.paints).map(([n,c]) => `<button type="button" title="${n}" aria-label="${n}" data-c="${c}" style="background:${c}"></button>`).join('');
+  document.querySelectorAll('#paint button').forEach(b => b.addEventListener('click', () => { spec.paint.color = b.dataset.c; draw(false); }));
+  document.querySelectorAll('#accent button').forEach(b => b.addEventListener('click', () => { spec.paint.accent = b.dataset.c; draw(false); }));
+  $('finish').innerHTML = DATA.finishes.map(f => `<option>${f}</option>`).join('');
+  $('finish').addEventListener('change', () => { spec.paint.finish = $('finish').value; draw(false); });
+  $('elec').innerHTML = DATA.options.electronics.map(e => `<label><input type="checkbox" value="${e}"> ${e}</label>`).join('');
+  $('elec').addEventListener('change', () => { spec.electronics = [...document.querySelectorAll('#elec input:checked')].map(i => i.value); draw(false); });
+  $('rearDisc').addEventListener('change', () => { spec.brakes = { ...(spec.brakes||{}), rearDisc: $('rearDisc').checked }; draw(false); });
+  $('example').innerHTML = Object.keys(DATA.examples).map(k => `<option>${k}</option>`).join('');
+  $('example').addEventListener('change', () => { spec = JSON.parse(JSON.stringify(DATA.examples[$('example').value])); fill(); draw(true); });
+  $('stages').innerHTML = '<i></i>'.repeat(9);
+}
+function norm() { spec.engine = spec.engine || { layout: 'single', cylinders: 1 }; spec.paint = { color: '#c8102e', accent: '#f2c230', finish: 'gloss', ...(spec.paint||{}) }; spec.electronics = spec.electronics || []; }
+function fill() { norm(); for (const [k,, get] of FIELDS) { const v = get(spec); const el = $('f-' + k); if (v != null) el.value = v; }
+  $('finish').value = spec.paint.finish; $('rearDisc').checked = !!(spec.brakes && spec.brakes.rearDisc);
+  document.querySelectorAll('#elec input').forEach(i => i.checked = spec.electronics.includes(i.value));
+  document.querySelectorAll('#paint button').forEach(b => b.setAttribute('aria-pressed', b.dataset.c.toLowerCase() === spec.paint.color.toLowerCase()));
+  document.querySelectorAll('#accent button').forEach(b => b.setAttribute('aria-pressed', b.dataset.c.toLowerCase() === spec.paint.accent.toLowerCase())); }
+function draw(animate) {
+  norm(); let r;
+  try { r = renderBikeSVG(spec, { animate, uid: 'd' + (++uidN) }); } catch (e) { $('warn').textContent = e.message; return; }
+  $('bike').innerHTML = r.svg; fill();
+  $('warn').textContent = r.warnings.length ? 'Aproximado nesta fase: ' + r.warnings.join(' · ') : '';
+  $('json').textContent = JSON.stringify(spec, null, 2);
+  if (animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) { const bars = [...$('stages').children]; bars.forEach(b => b.style.background = ''); bars.forEach((b, i) => setTimeout(() => b.style.background = 'var(--accent)', i * 520)); }
+  else [...$('stages').children].forEach(b => b.style.background = 'var(--accent)');
+}
+function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+$('replay').addEventListener('click', () => draw(true));
+$('random').addEventListener('click', () => { const o = DATA.options; const l = pick(o.engine);
+  spec = { category: pick(DATA.categories), engine: { layout: l, cylinders: l==='single'?1:l==='parallel'?2:4, cooling: pick(o.cooling) }, frame: { type: pick(o.frame), material: pick(o.material) }, fork: pick(o.fork), shock: pick(o.shock),
+    brakes: { front: pick(o.brake), rearDisc: Math.random() > .5 }, wheels: pick(o.wheels), tyres: pick(o.tyres), fairing: pick(o.fairing), exhaust: pick(o.exhaust), electronics: o.electronics.filter(() => Math.random() > .75),
+    paint: { color: pick(Object.values(DATA.paints)), accent: pick(Object.values(DATA.paints)), finish: pick(DATA.finishes) } }; draw(false); });
+build(); draw(true);
+</script></body></html>

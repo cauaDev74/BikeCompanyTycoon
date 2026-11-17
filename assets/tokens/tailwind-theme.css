@@ -1,0 +1,25 @@
+/* Tailwind v4: @import "tailwindcss"; @import "./design-tokens.css"; @import "./tailwind-theme.css"; */
+@theme {
+  --color-background: #0b2d7a;
+  --color-navy: #071a4a;
+  --color-foreground: #ffffff;
+  --color-primary: #ffffff;
+  --color-accent: #3ccb4f;
+  --color-money: #3ccb4f;
+  --color-ev: #3ccb4f;
+  --color-gold: #ffd43b;
+  --color-warning: #ffd43b;
+  --color-destructive: #ff5c5c;
+  --color-card: rgba(255,255,255,.09);
+  --color-surface: rgba(255,255,255,.07);
+  --color-steel: rgba(255,255,255,.16);
+  --color-muted: rgba(255,255,255,.08);
+  --color-border: rgba(255,255,255,.18);
+  --radius-sm: calc(var(--radius) * .5);
+  --radius-md: calc(var(--radius) * .75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --font-display: "Lilita One", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: ui-monospace, Menlo, monospace;
+}

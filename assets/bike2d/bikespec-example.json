@@ -1,0 +1,14 @@
+{
+  "category": "cafe-racer",
+  "engine": { "layout": "parallel", "cylinders": 2, "cooling": "air" },
+  "frame": { "type": "cradle", "material": "steel" },
+  "fork": "telescopic",
+  "shock": "dual",
+  "brakes": { "front": "drum", "rearDisc": false, "abs": "none" },
+  "wheels": "spoke",
+  "tyres": "touring",
+  "fairing": "none",
+  "exhaust": "twin",
+  "electronics": [],
+  "paint": { "color": "#c8102e", "accent": "#f2c230", "finish": "gloss" }
+}

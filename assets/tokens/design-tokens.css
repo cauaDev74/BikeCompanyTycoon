@@ -1,0 +1,65 @@
+/* Bike Company Tycoon — design tokens (GDD §15). Uma paleta para o jogo todo. */
+:root {
+  /* cor */
+  --bg: #0b2d7a;
+  --navy: #071a4a;
+  --fg: #ffffff;
+  --accent: #3ccb4f;
+  --money: var(--accent);
+  --ev: var(--accent);
+  --gold: #ffd43b;
+  --warning: var(--gold);
+  --destructive: #ff5c5c;
+
+  /* vidro: branco em alfa */
+  --surface: rgba(255,255,255,.07);
+  --muted:   rgba(255,255,255,.08);
+  --card:    rgba(255,255,255,.09);
+  --steel:   rgba(255,255,255,.16);
+  --border-glass: rgba(255,255,255,.18);
+  --scrim: rgba(7,26,74,.72);
+  --text-soft: rgba(255,255,255,.85);
+  --glass-blur: 14px;
+
+  /* forma: um valor, escala derivada */
+  --radius: 16px;
+  --radius-xs: calc(var(--radius) * .25);
+  --radius-sm: calc(var(--radius) * .5);
+  --radius-md: calc(var(--radius) * .75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-pill: 999px;
+
+  /* espaçamento (grade de 4px) */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px;
+
+  /* sombras */
+  --shadow-1: 0 2px 8px rgba(7,26,74,.35);
+  --shadow-2: 0 8px 24px rgba(7,26,74,.45);
+  --shadow-3: 0 20px 48px rgba(7,26,74,.6);
+  --focus-ring: 0 0 0 3px var(--bg), 0 0 0 5px var(--fg);
+
+  /* z-index */
+  --z-base: 0; --z-sticky: 10; --z-sheet: 30; --z-modal: 40; --z-toast: 50;
+
+  /* tipografia */
+  --font-display: "Lilita One", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --text-xs: .875rem;
+  --text-sm: .9375rem; --text-md: 1rem; --text-lg: 1.25rem;
+  --text-xl: 1.75rem;  --text-2xl: 2.5rem; --text-3xl: 3.5rem;
+  --lh-body: 1.5; --lh-display: 1.1;
+  --tracking-display: .04em;
+
+  /* motion (GDD §15) */
+  --stage-ms: 520ms; --stage-hold: 3200ms; --stagger-ms: 35ms; --toast-ms: 2600ms;
+  --ease: cubic-bezier(.2,.8,.2,1);
+
+  /* moto procedural: sobrescritas pelo renderizador */
+  --paint: #c8102e; --accent-paint: #f2c230;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --stage-ms: 0ms; --stage-hold: 0ms; --stagger-ms: 0ms; }
+}

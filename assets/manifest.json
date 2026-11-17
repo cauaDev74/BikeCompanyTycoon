@@ -1,0 +1,746 @@
+{
+ "phase": 2,
+ "assets": [
+  {
+   "id": "icon-hub-new-project",
+   "path": "icons/icon-hub-new-project.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-hub-research",
+   "path": "icons/icon-hub-research.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-hub-factory",
+   "path": "icons/icon-hub-factory.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-hub-market",
+   "path": "icons/icon-hub-market.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-hub-rating",
+   "path": "icons/icon-hub-rating.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-hub-reviews",
+   "path": "icons/icon-hub-reviews.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-hub-finance",
+   "path": "icons/icon-hub-finance.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-hub-staff",
+   "path": "icons/icon-hub-staff.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-hub-racing",
+   "path": "icons/icon-hub-racing.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-hub-hq",
+   "path": "icons/icon-hub-hq.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-hub-news",
+   "path": "icons/icon-hub-news.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-hub-achievements",
+   "path": "icons/icon-hub-achievements.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-hub-settings",
+   "path": "icons/icon-hub-settings.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§03 tiles",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-kpi-cash",
+   "path": "icons/icon-kpi-cash.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§10 KPI",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-kpi-reputation",
+   "path": "icons/icon-kpi-reputation.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§10 KPI",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-kpi-awareness",
+   "path": "icons/icon-kpi-awareness.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§10 KPI",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-kpi-rp",
+   "path": "icons/icon-kpi-rp.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§10 KPI",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-kpi-stock",
+   "path": "icons/icon-kpi-stock.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§10 KPI",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-kpi-lock",
+   "path": "icons/icon-kpi-lock.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§10 KPI",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-kpi-up",
+   "path": "icons/icon-kpi-up.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§10 KPI",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-kpi-down",
+   "path": "icons/icon-kpi-down.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§10 KPI",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-cat-scooter",
+   "path": "icons/icon-cat-scooter.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§06 categorias",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-cat-cafe-racer",
+   "path": "icons/icon-cat-cafe-racer.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§06 categorias",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-cat-cruiser",
+   "path": "icons/icon-cat-cruiser.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§06 categorias",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-cat-dual-sport",
+   "path": "icons/icon-cat-dual-sport.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§06 categorias",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-cat-naked",
+   "path": "icons/icon-cat-naked.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§06 categorias",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-cat-touring",
+   "path": "icons/icon-cat-touring.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§06 categorias",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-cat-sportbike",
+   "path": "icons/icon-cat-sportbike.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§06 categorias",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-cat-adventure",
+   "path": "icons/icon-cat-adventure.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§06 categorias",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "icon-cat-electric",
+   "path": "icons/icon-cat-electric.svg",
+   "type": "svg",
+   "viewBox": "0 0 24 24",
+   "ratio": "1:1",
+   "gdd": "§06 categorias",
+   "status": "done",
+   "deps": [],
+   "notes": "currentColor, traço 2px"
+  },
+  {
+   "id": "pwa-icon-192",
+   "path": "brand/pwa/icon-192-maskable.svg",
+   "type": "svg",
+   "viewBox": "0 0 512 512",
+   "ratio": "1:1",
+   "gdd": "§15 ícones",
+   "status": "done",
+   "deps": [],
+   "notes": "maskable, conteúdo na zona segura de 80%; exportar PNG no build"
+  },
+  {
+   "id": "pwa-icon-512",
+   "path": "brand/pwa/icon-512-maskable.svg",
+   "type": "svg",
+   "viewBox": "0 0 512 512",
+   "ratio": "1:1",
+   "gdd": "§15 ícones",
+   "status": "done",
+   "deps": [],
+   "notes": "maskable, conteúdo na zona segura de 80%; exportar PNG no build"
+  },
+  {
+   "id": "logo-emblem",
+   "path": "brand/logo-emblem.svg",
+   "type": "svg",
+   "gdd": "§15",
+   "status": "done",
+   "deps": [],
+   "notes": "emblema"
+  },
+  {
+   "id": "logo-wordmark",
+   "path": "brand/logo-wordmark.svg",
+   "type": "svg",
+   "gdd": "§15",
+   "status": "done",
+   "deps": [],
+   "notes": "wordmark"
+  },
+  {
+   "id": "favicon-light",
+   "path": "brand/favicon-light.svg",
+   "type": "svg",
+   "gdd": "§15",
+   "status": "done",
+   "deps": [],
+   "notes": "favicon claro"
+  },
+  {
+   "id": "favicon-dark",
+   "path": "brand/favicon-dark.svg",
+   "type": "svg",
+   "gdd": "§15",
+   "status": "done",
+   "deps": [],
+   "notes": "favicon escuro"
+  },
+  {
+   "id": "company-logo-generator",
+   "path": "brand/company-logo.js",
+   "type": "js",
+   "gdd": "§02 logo",
+   "status": "done",
+   "deps": [],
+   "notes": "8 formas; SVG parametrizável"
+  },
+  {
+   "id": "style-guide",
+   "path": "style-guide.html",
+   "type": "html",
+   "gdd": "§15",
+   "status": "done",
+   "deps": [],
+   "notes": "página única, mostra tudo da Fase 1"
+  },
+  {
+   "id": "design-tokens",
+   "path": "tokens/design-tokens.css",
+   "type": "css",
+   "gdd": "§15",
+   "status": "done",
+   "deps": [],
+   "notes": ""
+  },
+  {
+   "id": "tailwind-theme",
+   "path": "tokens/tailwind-theme.css",
+   "type": "css",
+   "gdd": "§15",
+   "status": "done",
+   "deps": [],
+   "notes": ""
+  },
+  {
+   "id": "glass",
+   "path": "ui/glass.css",
+   "type": "css",
+   "gdd": "§15",
+   "status": "done",
+   "deps": [],
+   "notes": ""
+  },
+  {
+   "id": "pwa-icon-192-png",
+   "path": "brand/pwa/icon-192-maskable.png",
+   "type": "png",
+   "dimensions": "192x192",
+   "ratio": "1:1",
+   "gdd": "§15",
+   "status": "done",
+   "deps": [],
+   "notes": "derivado do SVG"
+  },
+  {
+   "id": "pwa-icon-512-png",
+   "path": "brand/pwa/icon-512-maskable.png",
+   "type": "png",
+   "dimensions": "512x512",
+   "ratio": "1:1",
+   "gdd": "§15",
+   "status": "done",
+   "deps": [],
+   "notes": "derivado do SVG"
+  },
+  {
+   "id": "decisions",
+   "path": "../docs/DECISIONS.md",
+   "type": "md",
+   "status": "done"
+  },
+  {
+   "id": "qa-report",
+   "path": "../docs/QA-REPORT.md",
+   "type": "md",
+   "status": "done"
+  },
+  {
+   "id": "bike2d-geometry",
+   "path": "bike2d/geometry.js",
+   "type": "js",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "geometria e ancoragens das 3 categorias"
+  },
+  {
+   "id": "bike2d-parts",
+   "path": "bike2d/parts.js",
+   "type": "js",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "peças SVG e mapa de aproximações"
+  },
+  {
+   "id": "bike2d-renderer",
+   "path": "bike2d/renderer.js",
+   "type": "js",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "renderBikeSVG(BikeSpec) → SVG em 9 camadas"
+  },
+  {
+   "id": "bike2d-spec-example",
+   "path": "bike2d/bikespec-example.json",
+   "type": "json",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "BikeSpec exemplo"
+  },
+  {
+   "id": "bike2d-demo",
+   "path": "bike2d/demo.html",
+   "type": "html",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "seletor de peças ao vivo; fonte em demo.template.html"
+  },
+  {
+   "id": "bike2d-readme",
+   "path": "bike2d/README.md",
+   "type": "md",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "camadas, ancoragens, cobertura"
+  },
+  {
+   "id": "bike2d-sil-cafe-racer",
+   "path": "bike2d/silhouettes/bike2d-sil-cafe-racer.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§06",
+   "status": "done",
+   "deps": [],
+   "notes": "rodas + carroceria em primer"
+  },
+  {
+   "id": "bike2d-sil-scooter",
+   "path": "bike2d/silhouettes/bike2d-sil-scooter.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§06",
+   "status": "done",
+   "deps": [],
+   "notes": "rodas + carroceria em primer"
+  },
+  {
+   "id": "bike2d-sil-sportbike",
+   "path": "bike2d/silhouettes/bike2d-sil-sportbike.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§06",
+   "status": "done",
+   "deps": [],
+   "notes": "rodas + carroceria em primer"
+  },
+  {
+   "id": "bike2d-cafe-1960-classic",
+   "path": "bike2d/examples/bike2d-cafe-1960-classic.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "moto montada de exemplo"
+  },
+  {
+   "id": "bike2d-cafe-double-cradle",
+   "path": "bike2d/examples/bike2d-cafe-double-cradle.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "moto montada de exemplo"
+  },
+  {
+   "id": "bike2d-cafe-semiactive-approx",
+   "path": "bike2d/examples/bike2d-cafe-semiactive-approx.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "moto montada de exemplo"
+  },
+  {
+   "id": "bike2d-cafe-single-spoke",
+   "path": "bike2d/examples/bike2d-cafe-single-spoke.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "moto montada de exemplo"
+  },
+  {
+   "id": "bike2d-cafe-trellis-alloy",
+   "path": "bike2d/examples/bike2d-cafe-trellis-alloy.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "moto montada de exemplo"
+  },
+  {
+   "id": "bike2d-scooter-commuter",
+   "path": "bike2d/examples/bike2d-scooter-commuter.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "moto montada de exemplo"
+  },
+  {
+   "id": "bike2d-scooter-modern",
+   "path": "bike2d/examples/bike2d-scooter-modern.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "moto montada de exemplo"
+  },
+  {
+   "id": "bike2d-sport-naked-twin",
+   "path": "bike2d/examples/bike2d-sport-naked-twin.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "moto montada de exemplo"
+  },
+  {
+   "id": "bike2d-sport-offroad-tyres",
+   "path": "bike2d/examples/bike2d-sport-offroad-tyres.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "moto montada de exemplo"
+  },
+  {
+   "id": "bike2d-sport-superbike",
+   "path": "bike2d/examples/bike2d-sport-superbike.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "moto montada de exemplo"
+  },
+  {
+   "id": "bike2d-sport-winglets-chrome",
+   "path": "bike2d/examples/bike2d-sport-winglets-chrome.svg",
+   "type": "svg",
+   "viewBox": "0 0 1000 600",
+   "ratio": "5:3",
+   "gdd": "§07",
+   "status": "done",
+   "deps": [],
+   "notes": "moto montada de exemplo"
+  },
+  {
+   "id": "bike2d-frame-monocoque",
+   "path": "bike2d/parts.js",
+   "type": "js",
+   "gdd": "§05/§07",
+   "status": "todo",
+   "deps": [
+    "Monocoque Chassis"
+   ],
+   "notes": "aproximado por equivalente na Fase 2; arte própria na Fase 3"
+  },
+  {
+   "id": "bike2d-fork-semiactive",
+   "path": "bike2d/parts.js",
+   "type": "js",
+   "gdd": "§05/§07",
+   "status": "todo",
+   "deps": [
+    "Semi-Active Suspension"
+   ],
+   "notes": "aproximado por equivalente na Fase 2; arte própria na Fase 3"
+  },
+  {
+   "id": "bike2d-shock-linkage",
+   "path": "bike2d/parts.js",
+   "type": "js",
+   "gdd": "§05/§07",
+   "status": "todo",
+   "deps": [
+    "Rising-Rate Linkage"
+   ],
+   "notes": "aproximado por equivalente na Fase 2; arte própria na Fase 3"
+  },
+  {
+   "id": "bike2d-brake-monoblock",
+   "path": "bike2d/parts.js",
+   "type": "js",
+   "gdd": "§05/§07",
+   "status": "todo",
+   "deps": [
+    "Monoblock Calipers"
+   ],
+   "notes": "aproximado por equivalente na Fase 2; arte própria na Fase 3"
+  },
+  {
+   "id": "bike2d-exhaust-underseat",
+   "path": "bike2d/parts.js",
+   "type": "js",
+   "gdd": "§05/§07",
+   "status": "todo",
+   "deps": [
+    "Full Fairing"
+   ],
+   "notes": "aproximado por equivalente na Fase 2; arte própria na Fase 3"
+  },
+  {
+   "id": "bike2d-engine-v-boxer-i3-v4-i6-electric",
+   "path": "bike2d/parts.js",
+   "type": "js",
+   "gdd": "§05/§07",
+   "status": "todo",
+   "deps": [
+    "várias"
+   ],
+   "notes": "aproximado por equivalente na Fase 2; arte própria na Fase 3"
+  }
+ ]
+}
