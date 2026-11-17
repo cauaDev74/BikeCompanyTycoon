@@ -64,7 +64,3 @@ Formas: shield, circle, hexagon, diamond, star, chevron, roundel, pennant.
 - Ícones: grade 24x24, traço 2px, `currentColor`.
 - Todo asset novo entra no `assets/manifest.json` com status `done`, `prompt-only` ou `todo`.
 - Limites de peso: SVG de camada abaixo de 20 KB, WebP de peça abaixo de 120 KB, herói 16:9 abaixo de 250 KB.
-
-## Licença
-
-Ainda não definida. Adicione um arquivo `LICENSE` antes de tornar o repositório público.
